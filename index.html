@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gitar Nota Okuma Akademisi - Süreli</title>
+    <title>Gitar Nota Okuma Akademisi - Pro</title>
     <style>
         body { font-family: sans-serif; background: #1a1a2e; color: white; text-align: center; margin: 0; padding: 10px; }
-        .container { max-width: 700px; margin: auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .container { max-width: 750px; margin: auto; background: #16213e; padding: 20px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); position: relative; min-height: 600px; }
         
         /* DİZEK TASARIMI */
-        .staff-bg { background: white; padding: 50px 10px; border-radius: 12px; margin: 20px 0; display: flex; justify-content: center; position: relative; overflow: hidden; }
+        .staff-bg { background: white; padding: 50px 10px; border-radius: 15px; margin: 20px 0; display: flex; justify-content: center; position: relative; min-height: 250px; }
         svg { overflow: visible; }
         
         /* ZAMAN ÇUBUĞU */
-        #timer-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #333; }
-        #timer-bar { height: 100%; width: 100%; background: #4eeaf6; transition: width 0.1s linear; }
+        #timer-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 10px; background: #222; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; }
+        #timer-bar { height: 100%; width: 100%; background: #4eeaf6; transition: width 0.1s linear; border-bottom-left-radius: 15px; }
 
-        /* ŞIKLAR */
-        .options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        @media (min-width: 500px) { .options-container { grid-template-columns: repeat(5, 1fr); } }
-        
-        .btn-secenek { 
-            padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; 
-            border: 2px solid #533483; border-radius: 10px; background: #0f3460; 
-            color: white; transition: 0.2s; 
-        }
+        /* BUTONLAR VE ŞIKLAR */
+        .options-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; margin-top: 20px; }
+        .btn-secenek { padding: 18px; font-size: 20px; font-weight: bold; cursor: pointer; border: 2px solid #533483; border-radius: 12px; background: #0f3460; color: white; transition: 0.2s; }
         .btn-secenek:hover:not(:disabled) { background: #e94560; transform: scale(1.05); }
         .btn-secenek:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .header-panel { display: flex; justify-content: space-around; background: #0f3460; padding: 10px; border-radius: 10px; margin-bottom: 10px; }
-        .stat span { color: #ffba08; font-size: 22px; font-weight: bold; }
-        #mesaj { font-size: 18px; font-weight: bold; margin: 15px; min-height: 25px; }
+        /* PANEL VE STATS */
+        .header-panel { display: flex; justify-content: space-around; background: #0f3460; padding: 12px; border-radius: 12px; margin-bottom: 10px; }
+        .stat span { color: #ffba08; font-size: 24px; font-weight: bold; }
+        #mesaj { font-size: 20px; font-weight: bold; margin: 15px; min-height: 35px; color: #4eeaf6; }
         
+        /* OVERLAY (GİRİŞ EKRANI) */
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 26, 46, 0.98); z-index: 1000; border-radius: 25px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .btn-main { padding: 25px 60px; font-size: 30px; background: #2ecc71; color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .btn-finish { margin-top: 20px; background: #e94560; padding: 10px 20px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
+
         .correct { background: #2ecc71 !important; border-color: white !important; }
         .wrong { background: #e94560 !important; border-color: white !important; }
     </style>
@@ -39,8 +39,12 @@
 <body>
 
 <div class="container">
-    <h2>Nota Okuma Okulu</h2>
-    
+    <div id="overlay">
+        <h1 style="color:#ffba08; font-size: 40px; margin-bottom: 20px;">Nota Akademisi</h1>
+        <p style="margin-bottom: 30px;">Duyduğun ve gördüğün notayı hızlıca tahmin et!</p>
+        <button class="btn-main" onclick="oyunuBaslat()">BAŞLA</button>
+    </div>
+
     <div class="header-panel">
         <div class="stat">Puan: <span id="puan">0</span></div>
         <div class="stat">Hak: <span id="hak">3</span></div>
@@ -55,36 +59,162 @@
             <line x1="20" y1="140" x2="330" y2="140" stroke="#333" stroke-width="2" />
             
             <text x="15" y="160" font-size="180" fill="#333" font-family="serif">𝄞</text>
-            
             <g id="nota-grubu"></g>
         </svg>
-        
-        <div id="timer-container">
-            <div id="timer-bar"></div>
-        </div>
+        <div id="timer-container"><div id="timer-bar"></div></div>
     </div>
 
-    <div id="mesaj">Hazır mısın?</div>
+    <div id="mesaj">Butona basarak başla!</div>
     <div class="options-container" id="siklar-alani"></div>
 
-    <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:#555; cursor:pointer; text-decoration:underline;">Yeniden Başlat</button>
+    <button class="btn-finish" onclick="oyunuBitir()">OYUNU BİTİR</button>
 </div>
 
 <script>
     let puan = 0, hak = 3, mevcutHedef = null;
-    let süre = 70; // 7 saniye (100ms * 70)
-    let zamanlayıcı;
+    let süre = 70, zamanlayıcı, audioCtx;
     const notaAdlari = ['DO', 'RE', 'Mİ', 'FA', 'SOL', 'LA', 'Sİ'];
 
     const notaHavuzu = [
-        {ad: "SOL", y: 50, ledger: []},
-        {ad: "FA", y: 60, ledger: []},
-        {ad: "Mİ", y: 70, ledger: []},
-        {ad: "RE", y: 80, ledger: []},
-        {ad: "DO", y: 90, ledger: []},
-        {ad: "Sİ", y: 100, ledger: []},
-        {ad: "LA", y: 110, ledger: []},
-        {ad: "SOL", y: 120, ledger: []},
-        {ad: "FA", y: 130, ledger: []},
-        {ad: "Mİ", y
+        {ad: "SOL", y: 50, f: 392.00, ledger: []},
+        {ad: "FA", y: 60, f: 349.23, ledger: []},
+        {ad: "Mİ", y: 70, f: 329.63, ledger: []},
+        {ad: "RE", y: 80, f: 293.66, ledger: []},
+        {ad: "DO", y: 90, f: 261.63, ledger: []},
+        {ad: "Sİ", y: 100, f: 246.94, ledger: []},
+        {ad: "LA", y: 110, f: 220.00, ledger: []},
+        {ad: "SOL", y: 120, f: 196.00, ledger: []},
+        {ad: "FA", y: 130, f: 174.61, ledger: []},
+        {ad: "Mİ", y: 140, f: 164.81, ledger: []},
+        {ad: "RE", y: 150, f: 146.83, ledger: []},
+        {ad: "DO", y: 160, f: 130.81, ledger: [160]},
+        {ad: "Sİ", y: 170, f: 123.47, ledger: [160]},
+        {ad: "LA", y: 180, f: 110.00, ledger: [160, 180]},
+        {ad: "SOL", y: 190, f: 98.00, ledger: [160, 180]},
+        {ad: "FA", y: 200, f: 87.31, ledger: [160, 180, 200]},
+        {ad: "Mİ", y: 210, f: 82.41, ledger: [160, 180, 200]}
+    ];
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function notaSesiCal(frekans, sure = 0.8) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(frekans, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + sure);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + sure);
+    }
+
+    function oyunuBaslat() {
+        initAudio();
+        document.getElementById('overlay').style.display = 'none';
+        puan = 0; hak = 3;
+        document.getElementById('puan').innerText = puan;
+        document.getElementById('hak').innerText = hak;
+        yeniSoru();
+    }
+
+    function yeniSoru() {
+        if (hak <= 0) return;
+        clearInterval(zamanlayıcı);
+        süre = 70;
+        document.getElementById('timer-bar').style.width = "100%";
+        document.getElementById('timer-bar').style.background = "#4eeaf6";
+
+        mevcutHedef = notaHavuzu[Math.floor(Math.random() * notaHavuzu.length)];
         
+        const grup = document.getElementById('nota-grubu');
+        grup.innerHTML = "";
+        mevcutHedef.ledger.forEach(ly => {
+            const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            l.setAttribute("x1", "180"); l.setAttribute("y1", ly); l.setAttribute("x2", "230"); l.setAttribute("y2", ly);
+            l.setAttribute("stroke", "#333"); l.setAttribute("stroke-width", "2");
+            grup.appendChild(l);
+        });
+        const n = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
+        n.setAttribute("cx", "205"); n.setAttribute("cy", mevcutHedef.y);
+        n.setAttribute("rx", "12"); n.setAttribute("ry", "9");
+        n.setAttribute("fill", "#e94560");
+        grup.appendChild(n);
+
+        // Notanın sesini çal
+        notaSesiCal(mevcutHedef.f);
+
+        olusturSiklar();
+        document.getElementById('mesaj').innerText = "Bu hangi nota?";
+        
+        zamanlayıcı = setInterval(() => {
+            süre--;
+            let yuzde = (süre / 70) * 100;
+            document.getElementById('timer-bar').style.width = yuzde + "%";
+            if (yuzde < 30) document.getElementById('timer-bar').style.background = "#e94560";
+            if (süre <= 0) hataYap("Süre Doldu! ⏰");
+        }, 100);
+    }
+
+    function olusturSiklar() {
+        const alan = document.getElementById('siklar-alani');
+        alan.innerHTML = "";
+        let siklar = [mevcutHedef.ad];
+        while(siklar.length < 5) {
+            let r = notaAdlari[Math.floor(Math.random() * notaAdlari.length)];
+            if(!siklar.includes(r)) siklar.push(r);
+        }
+        siklar.sort(() => Math.random() - 0.5);
+        siklar.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'btn-secenek';
+            b.innerText = s;
+            b.onclick = () => kontrol(s, b);
+            alan.appendChild(b);
+        });
+    }
+
+    function kontrol(tahmin, buton) {
+        if (hak <= 0 || süre <= 0) return;
+        clearInterval(zamanlayıcı);
+        const butonlar = document.querySelectorAll('.btn-secenek');
+        butonlar.forEach(b => b.disabled = true);
+
+        if (tahmin === mevcutHedef.ad) {
+            puan += 10;
+            document.getElementById('puan').innerText = puan;
+            document.getElementById('mesaj').innerText = "Harika! ✅";
+            buton.classList.add('correct');
+            setTimeout(yeniSoru, 800);
+        } else {
+            hataYap("Yanlış! ❌");
+            buton.classList.add('wrong');
+        }
+    }
+
+    function hataYap(mesaj) {
+        clearInterval(zamanlayıcı);
+        hak--;
+        document.getElementById('hak').innerText = hak;
+        document.getElementById('mesaj').innerText = mesaj + " (Cevap: " + mevcutHedef.ad + ")";
+        document.getElementById('mesaj').style.color = "#e94560";
+        if (hak <= 0) oyunuBitir();
+        else setTimeout(yeniSoru, 1500);
+    }
+
+    function oyunuBitir() {
+        clearInterval(zamanlayıcı);
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('overlay').innerHTML = `
+            <h1 style="color:#e94560">Oyun Bitti!</h1>
+            <p style="font-size:24px">Toplam Puan: ${puan}</p>
+            <button class="btn-main" onclick="location.reload()" style="margin-top:20px">YENİDEN DENE</button>
+        `;
+    }
+</script>
+</body>
+</html>
