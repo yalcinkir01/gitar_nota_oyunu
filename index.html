@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gitar Nota Okuma Akademisi</title>
+    <title>Gitar Nota Okuma Akademisi - Süreli</title>
     <style>
         body { font-family: sans-serif; background: #1a1a2e; color: white; text-align: center; margin: 0; padding: 10px; }
         .container { max-width: 700px; margin: auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         /* DİZEK TASARIMI */
-        .staff-bg { background: white; padding: 40px 10px; border-radius: 12px; margin: 20px 0; display: flex; justify-content: center; }
+        .staff-bg { background: white; padding: 50px 10px; border-radius: 12px; margin: 20px 0; display: flex; justify-content: center; position: relative; overflow: hidden; }
         svg { overflow: visible; }
         
+        /* ZAMAN ÇUBUĞU */
+        #timer-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 8px; background: #333; }
+        #timer-bar { height: 100%; width: 100%; background: #4eeaf6; transition: width 0.1s linear; }
+
         /* ŞIKLAR */
         .options-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         @media (min-width: 500px) { .options-container { grid-template-columns: repeat(5, 1fr); } }
@@ -36,40 +40,43 @@
 
 <div class="container">
     <h2>Nota Okuma Okulu</h2>
-    <p style="font-size: 12px; color: #888;">Gitar 1. Pozisyon Notaları</p>
-
+    
     <div class="header-panel">
         <div class="stat">Puan: <span id="puan">0</span></div>
         <div class="stat">Hak: <span id="hak">3</span></div>
     </div>
 
     <div class="staff-bg">
-        <svg width="350" height="220" viewBox="0 0 350 220">
+        <svg width="350" height="240" viewBox="0 0 350 240">
             <line x1="20" y1="60" x2="330" y2="60" stroke="#333" stroke-width="2" />
             <line x1="20" y1="80" x2="330" y2="80" stroke="#333" stroke-width="2" />
             <line x1="20" y1="100" x2="330" y2="100" stroke="#333" stroke-width="2" />
             <line x1="20" y1="120" x2="330" y2="120" stroke="#333" stroke-width="2" />
             <line x1="20" y1="140" x2="330" y2="140" stroke="#333" stroke-width="2" />
             
-            <text x="25" y="145" font-size="120" fill="#333" font-family="serif">𝄞</text>
+            <text x="15" y="160" font-size="180" fill="#333" font-family="serif">𝄞</text>
             
             <g id="nota-grubu"></g>
         </svg>
+        
+        <div id="timer-container">
+            <div id="timer-bar"></div>
+        </div>
     </div>
 
-    <div id="mesaj">Başlamak için bir şık seç!</div>
+    <div id="mesaj">Hazır mısın?</div>
     <div class="options-container" id="siklar-alani"></div>
 
-    <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:#555; cursor:pointer; text-decoration:underline;">Sıfırla</button>
+    <button onclick="location.reload()" style="margin-top:20px; background:none; border:none; color:#555; cursor:pointer; text-decoration:underline;">Yeniden Başlat</button>
 </div>
 
 <script>
     let puan = 0, hak = 3, mevcutHedef = null;
+    let süre = 70; // 7 saniye (100ms * 70)
+    let zamanlayıcı;
     const notaAdlari = ['DO', 'RE', 'Mİ', 'FA', 'SOL', 'LA', 'Sİ'];
 
-    // Gitar 1. Pozisyon Nota Havuzu (Müzikal olarak tam doğru koordinatlar)
     const notaHavuzu = [
-        // İnce tellerden kalına doğru
         {ad: "SOL", y: 50, ledger: []},
         {ad: "FA", y: 60, ledger: []},
         {ad: "Mİ", y: 70, ledger: []},
@@ -79,102 +86,5 @@
         {ad: "LA", y: 110, ledger: []},
         {ad: "SOL", y: 120, ledger: []},
         {ad: "FA", y: 130, ledger: []},
-        {ad: "Mİ", y: 140, ledger: []},
-        {ad: "RE", y: 150, ledger: []},
-        {ad: "DO", y: 160, ledger: [160]},
-        {ad: "Sİ", y: 170, ledger: [160]},
-        {ad: "LA", y: 180, ledger: [160, 180]},
-        {ad: "SOL", y: 190, ledger: [160, 180]},
-        {ad: "FA", y: 200, ledger: [160, 180, 200]},
-        {ad: "Mİ", y: 210, ledger: [160, 180, 200]}
-    ];
-
-    window.onload = yeniSoru;
-
-    function yeniSoru() {
-        if (hak <= 0) return;
+        {ad: "Mİ", y
         
-        // Rastgele nota seç
-        mevcutHedef = notaHavuzu[Math.floor(Math.random() * notaHavuzu.length)];
-        
-        // Notayı çiz
-        const grup = document.getElementById('nota-grubu');
-        grup.innerHTML = "";
-        
-        // Ek çizgiler
-        mevcutHedef.ledger.forEach(ly => {
-            const l = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            l.setAttribute("x1", "180"); l.setAttribute("y1", ly);
-            l.setAttribute("x2", "230"); l.setAttribute("y2", ly);
-            l.setAttribute("stroke", "#333"); l.setAttribute("stroke-width", "2");
-            grup.appendChild(l);
-        });
-
-        // Nota başı
-        const n = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
-        n.setAttribute("cx", "205"); n.setAttribute("cy", mevcutHedef.y);
-        n.setAttribute("rx", "12"); n.setAttribute("ry", "9");
-        n.setAttribute("fill", "#e94560");
-        grup.appendChild(n);
-
-        // Şıkları üret (Garantili 5 seçenek)
-        olusturSiklar();
-        
-        document.getElementById('mesaj').innerText = "Bu nota hangisi?";
-        document.getElementById('mesaj').style.color = "white";
-    }
-
-    function olusturSiklar() {
-        const alan = document.getElementById('siklar-alani');
-        alan.innerHTML = "";
-
-        // Doğru cevabı al
-        let siklar = [mevcutHedef.ad];
-
-        // 4 tane benzersiz yanlış cevap ekle
-        while(siklar.length < 5) {
-            let r = notaAdlari[Math.floor(Math.random() * notaAdlari.length)];
-            if(!siklar.includes(r)) siklar.push(r);
-        }
-
-        // Şıkları karıştır
-        siklar.sort(() => Math.random() - 0.5);
-
-        siklar.forEach(s => {
-            const b = document.createElement('button');
-            b.className = 'btn-secenek';
-            b.innerText = s;
-            b.onclick = () => kontrol(s, b);
-            alan.appendChild(b);
-        });
-    }
-
-    function kontrol(tahmin, buton) {
-        if (hak <= 0) return;
-        const butonlar = document.querySelectorAll('.btn-secenek');
-        butonlar.forEach(b => b.disabled = true);
-
-        if (tahmin === mevcutHedef.ad) {
-            puan += 10;
-            document.getElementById('puan').innerText = puan;
-            document.getElementById('mesaj').innerText = "DOĞRU! ✅";
-            document.getElementById('mesaj').style.color = "#2ecc71";
-            buton.classList.add('correct');
-            setTimeout(yeniSoru, 1000);
-        } else {
-            hak--;
-            document.getElementById('hak').innerText = hak;
-            document.getElementById('mesaj').innerText = "YANLIŞ! ❌ (Doğru cevap: " + mevcutHedef.ad + ")";
-            document.getElementById('mesaj').style.color = "#e94560";
-            buton.classList.add('wrong');
-            
-            if (hak <= 0) {
-                document.getElementById('mesaj').innerText = "OYUN BİTTİ! Skor: " + puan;
-            } else {
-                setTimeout(yeniSoru, 1500);
-            }
-        }
-    }
-</script>
-</body>
-</html>
